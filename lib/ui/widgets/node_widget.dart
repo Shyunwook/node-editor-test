@@ -157,16 +157,12 @@ class _NodeWidgetState extends State<NodeWidget> {
         onDragUpdate: (details) {
           final canvasModel = context.read<CanvasModel>();
 
-          // Transform 역변환 적용: Global 좌표 → Transform 내부 좌표
-          // Transform은 translate + scale을 적용하므로 역연산 필요
-          final canvasPosition = Offset(
-            (details.globalPosition.dx - canvasModel.offset.dx) / canvasModel.scale,
-            (details.globalPosition.dy - canvasModel.offset.dy) / canvasModel.scale,
-          );
+          // InteractiveViewer 내부에서는 localPosition을 사용 (자동 변환됨)
+          final canvasPosition = details.localPosition;
 
-          print('🟡 [DRAG_UPDATE] Global Position: ${details.globalPosition}');
-          print('🟡 [DRAG_UPDATE] Canvas Position (Transform): $canvasPosition');
-          print('🟡 [DRAG_UPDATE] Canvas Offset: ${canvasModel.offset}, Scale: ${canvasModel.scale}');
+          print('🟡 [DRAG_UPDATE] Global Position: ${details.globalPosition}');  
+          print('🟡 [DRAG_UPDATE] Local Position: ${details.localPosition}');
+          print('🟡 [DRAG_UPDATE] Canvas Position (InteractiveViewer): $canvasPosition');
           canvasModel.updateTemporaryConnection(canvasPosition);
         },
         onDragEnd: (details) {

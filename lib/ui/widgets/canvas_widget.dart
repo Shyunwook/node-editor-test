@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
 import '../../models/canvas_model.dart';
 import '../../models/node_model.dart';
@@ -14,52 +13,49 @@ class CanvasWidget extends StatefulWidget {
 }
 
 class _CanvasWidgetState extends State<CanvasWidget> {
+  final TransformationController _transformationController =
+      TransformationController();
+
   @override
   Widget build(BuildContext context) {
     return Consumer<CanvasModel>(
       builder: (context, canvasModel, child) {
-        return Listener(
-          onPointerSignal: (event) => _handlePointerSignal(event, canvasModel),
-          child: MouseRegion(
-            onHover: (event) {
-              if (canvasModel.isConnecting) {
-                // 로컬 좌표를 캔버스 좌표로 변환
-                final canvasPosition = Offset(
-                  (event.position.dx - canvasModel.offset.dx) /
-                      canvasModel.scale,
-                  (event.position.dy - canvasModel.offset.dy) /
-                      canvasModel.scale,
-                );
-                canvasModel.updateTemporaryConnection(canvasPosition);
-              }
-            },
-            child: GestureDetector(
-              onPanUpdate: (details) => _handlePanUpdate(details, canvasModel),
-              onTapDown: (details) => _handleTapDown(details, canvasModel),
-              child: DragTarget<NodeType>(
-                onAcceptWithDetails: (details) =>
-                    _handleNodeDrop(details, canvasModel),
-                builder: (context, candidateData, rejectedData) {
-                  return Container(
-                    color: candidateData.isNotEmpty
-                        ? Colors.grey[800]
-                        : Colors.grey[900],
-                    child: CustomPaint(
-                      painter: GridPainter(canvasModel),
-                      child: Transform(
-                        transform: Matrix4.identity()
-                          ..translate(
-                            canvasModel.offset.dx,
-                            canvasModel.offset.dy,
-                          )
-                          ..scale(canvasModel.scale),
+        return SizedBox.expand(
+          child: InteractiveViewer(
+            transformationController: _transformationController,
+            boundaryMargin: const EdgeInsets.all(double.infinity),
+            minScale: 0.1,
+            maxScale: 5.0,
+            constrained: false,
+            scaleEnabled: true,
+            panEnabled: true,
+            child: MouseRegion(
+              onHover: (event) {
+                if (canvasModel.isConnecting) {
+                  // InteractiveViewer 내부에서는 로컬 좌표 직접 사용
+                  canvasModel.updateTemporaryConnection(event.localPosition);
+                }
+              },
+              child: GestureDetector(
+                onTapDown: (details) => _handleTapDown(details, canvasModel),
+                child: DragTarget<NodeType>(
+                  onAcceptWithDetails: (details) =>
+                      _handleNodeDrop(details, canvasModel),
+                  builder: (context, candidateData, rejectedData) {
+                    return Container(
+                      width: 50000, // 매우 큰 고정 캔버스 크기
+                      height: 50000,
+                      color: candidateData.isNotEmpty
+                          ? Colors.grey[800]
+                          : Colors.grey[900],
+                      child: CustomPaint(
+                        painter: GridPainter(canvasModel),
                         child: Stack(
-                          fit: StackFit.expand,
                           children: [
                             // 연결선을 노드들 뒤에 그리기
                             CustomPaint(
                               painter: ConnectionPainter(canvasModel),
-                              size: Size.infinite,
+                              size: const Size(50000, 50000),
                             ),
                             // 노드들을 렌더링
                             ...canvasModel.nodes.map(
@@ -85,26 +81,15 @@ class _CanvasWidgetState extends State<CanvasWidget> {
                           ],
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ),
         );
       },
     );
-  }
-
-  void _handlePointerSignal(PointerSignalEvent event, CanvasModel canvasModel) {
-    if (event is PointerScrollEvent) {
-      final delta = event.scrollDelta.dy;
-      canvasModel.scale = (canvasModel.scale - delta * 0.001).clamp(0.1, 3.0);
-    }
-  }
-
-  void _handlePanUpdate(DragUpdateDetails details, CanvasModel canvasModel) {
-    canvasModel.offset = canvasModel.offset + details.delta;
   }
 
   void _handleTapDown(TapDownDetails details, CanvasModel canvasModel) {
@@ -122,8 +107,8 @@ class _CanvasWidgetState extends State<CanvasWidget> {
     DragTargetDetails<NodeType> details,
     CanvasModel canvasModel,
   ) {
-    // 드롭된 위치를 캔버스 좌표로 변환
-    final canvasPosition = details.offset - canvasModel.offset;
+    // InteractiveViewer 내부에서는 offset을 직접 사용
+    final canvasPosition = details.offset;
     final nodeType = details.data;
 
     // 새 노드 생성
@@ -131,7 +116,7 @@ class _CanvasWidgetState extends State<CanvasWidget> {
       id: 'node_${DateTime.now().millisecondsSinceEpoch}',
       type: nodeType,
       title: _getNodeTitle(nodeType),
-      position: canvasPosition / canvasModel.scale,
+      position: canvasPosition,
     );
 
     // 노드 타입에 따라 포트 추가
@@ -188,16 +173,32 @@ class _CanvasWidgetState extends State<CanvasWidget> {
       if (canvasModel.nodes.isEmpty) {
         _initializeTestNodes(canvasModel);
       }
+
+      // 초기 뷰를 노드들이 있는 위치로 이동 (25000, 25000 근처)
+      // 화면 중앙이 캔버스의 25000, 25000 위치가 되도록 변환
+      final screenSize = MediaQuery.of(context).size;
+      final translation = Matrix4.identity()
+        ..translate(
+          screenSize.width / 2 - 25150.0, // 노드 위치 - 화면 중앙
+          screenSize.height / 2 - 25150.0,
+        );
+      _transformationController.value = translation;
     });
   }
 
+  @override
+  void dispose() {
+    _transformationController.dispose();
+    super.dispose();
+  }
+
   void _initializeTestNodes(CanvasModel canvasModel) {
-    // 테스트용 노드 추가
+    // 테스트용 노드 추가 - 캔버스 중앙에 배치
     final sceneNode = NodeModel(
       id: 'test1',
       type: NodeType.scene,
       title: 'Video Scene',
-      position: const Offset(100, 100),
+      position: const Offset(25000, 25000), // 캔버스 중앙
     );
     sceneNode.addOutputPort('scene_out', 'Scene Output', color: Colors.blue);
     canvasModel.addNode(sceneNode);
@@ -206,7 +207,7 @@ class _CanvasWidgetState extends State<CanvasWidget> {
       id: 'test2',
       type: NodeType.actor,
       title: 'Video Actor',
-      position: const Offset(300, 200),
+      position: const Offset(25300, 25200), // 캔버스 중앙 근처
     );
     actorNode.addInputPort('scene_in', 'Scene Input', color: Colors.blue);
     actorNode.addInputPort('trigger_in', 'Trigger', color: Colors.orange);
@@ -229,20 +230,12 @@ class GridPainter extends CustomPainter {
     const gridSize = 20.0;
 
     // 수직선 그리기
-    for (
-      double x = canvasModel.offset.dx % gridSize;
-      x < size.width;
-      x += gridSize
-    ) {
+    for (double x = 0; x < size.width; x += gridSize) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
     }
 
     // 수평선 그리기
-    for (
-      double y = canvasModel.offset.dy % gridSize;
-      y < size.height;
-      y += gridSize
-    ) {
+    for (double y = 0; y < size.height; y += gridSize) {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
   }
