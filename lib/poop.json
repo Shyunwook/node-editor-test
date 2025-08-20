@@ -1,0 +1,1085 @@
+{
+  "sceneType": "VideoScene",
+  "constructorName": "network",
+  "args": {
+    "isSequencedScene": {
+      "type": "bool",
+      "value": true
+    }
+  },
+  "interactions": [
+    {
+      "actorType": "videoContol",
+      "controllerType": "VideoScenarioController",
+      "args": {
+        "name": {
+          "type": "String",
+          "value": "poop1"
+        },
+        "width": {
+          "type": "double",
+          "value": 1280.0
+        },
+        "height": {
+          "type": "double",
+          "value": 720.0
+        },
+        "initialPosition": {
+          "type": "Offset",
+          "value": {
+            "dx": 0.0,
+            "dy": 0.0
+          }
+        },
+        "allowContinueActing": {
+          "type": "bool",
+          "value": false
+        },
+        "allowContinueVisibility": {
+          "type": "bool",
+          "value": false
+        },
+        "sectionColor": {
+          "type": "Color",
+          "value": "64f44336"
+        }
+      },
+      "info": {
+        "type": "CombineInfo",
+        "method": "combineNext",
+        "scenarioInfos": [
+          {
+            "type": "ScenarioInfo",
+            "signInfos": [
+              {
+                "detector": "tapGestureDetector",
+                "chaining": {
+                  "instance": {
+                    "name": "tapUp",
+                    "chaining": {
+                      "method": {
+                        "name": "event",
+                        "namedArguments": {
+                          "id": {
+                            "type": "String",
+                            "value": "s1"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "roleInfos": [
+              {
+                "name": "PlayVideoEventState",
+                "namedArguments": {
+                  "state": {
+                    "type": "EventState",
+                    "value": "end"
+                  },
+                  "from": {
+                    "type": "double",
+                    "value": 0.0
+                  },
+                  "to": {
+                    "type": "double",
+                    "value": 26677.782
+                  }
+                }
+              }
+            ],
+            "max": {
+              "type": "EventStateInfo",
+              "value": {
+                "type": "EventState",
+                "value": "end"
+              }
+            }
+          },
+          {
+            "type": "ScenarioInfo",
+            "signInfos": [
+              {
+                "detector": "videoPlayerDetector",
+                "chaining": {
+                  "method": {
+                    "name": "timing",
+                    "namedArguments": {
+                      "id": {
+                        "type": "String",
+                        "value": "s1"
+                      },
+                      "timing": {
+                        "type": "double",
+                        "value": 26677.782
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "roleInfos": [],
+            "max": {
+              "type": "EventStateInfo",
+              "value": {
+                "type": "EventState",
+                "value": "end"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "actorType": "videoContol",
+      "controllerType": "VideoScenarioController",
+      "args": {
+        "name": {
+          "type": "String",
+          "value": "poop2"
+        },
+        "width": {
+          "type": "double",
+          "value": 660
+        },
+        "height": {
+          "type": "double",
+          "value": 720.0
+        },
+        "initialPosition": {
+          "type": "Offset",
+          "value": {
+            "dx": 300.0,
+            "dy": 0.0
+          }
+        },
+        "allowInitialVisibility": {
+          "type": "bool",
+          "value": false
+        },
+        "allowContinueActing": {
+          "type": "bool",
+          "value": false
+        },
+        "allowContinueVisibility": {
+          "type": "bool",
+          "value": false
+        },
+        "sectionColor": {
+          "type": "Color",
+          "value": "642196f3"
+        }
+      },
+      "info": {
+        "type": "CombineInfo",
+        "method": "combineNext",
+        "scenarioInfos": [
+          {
+            "type": "CombineInfo",
+            "method": "combineAnd",
+            "scenarioInfos": [
+              {
+                "type": "ScenarioInfo",
+                "signInfos": [
+                  {
+                    "detector": "actorBuildDetector",
+                    "chaining": {
+                      "method": {
+                        "name": "event",
+                        "namedArguments": {
+                          "id": {
+                            "type": "String",
+                            "value": "s2-actorbuild"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "roleInfos": [
+                  {
+                    "name": "PlayVideoEventState",
+                    "namedArguments": {
+                      "from": {
+                        "type": "double",
+                        "value": 27094.622
+                      },
+                      "to": {
+                        "type": "double",
+                        "value": 30429.345
+                      },
+                      "loop": {
+                        "type": "bool",
+                        "value": true
+                      },
+                      "state": {
+                        "type": "EventState",
+                        "value": "start"
+                      }
+                    }
+                  }
+                ],
+                "max": {
+                  "type": "EventStateInfo",
+                  "value": {
+                    "type": "EventState",
+                    "value": "start"
+                  }
+                }
+              },
+              {
+                "type": "ScenarioInfo",
+                "signInfos": [
+                  {
+                    "detector": "tapGestureDetector",
+                    "chaining": {
+                      "instance": {
+                        "name": "tap",
+                        "chaining": {
+                          "method": {
+                            "name": "count",
+                            "namedArguments": {
+                              "id": {
+                                "type": "String",
+                                "value": "s2-tapDetector"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "roleInfos": [
+                  {
+                    "name": "PlayVideoInt",
+                    "namedArguments": {
+                      "number": {
+                        "type": "int",
+                        "value": 2
+                      },
+                      "from": {
+                        "type": "double",
+                        "value": 31263.026
+                      },
+                      "to": {
+                        "type": "double",
+                        "value": 48353.48
+                      },
+                      "loop": {
+                        "type": "bool",
+                        "value": false
+                      }
+                    }
+                  }
+                ],
+                "min": {
+                  "type": "int",
+                  "value": 0
+                },
+                "max": {
+                  "type": "int",
+                  "value": 2
+                }
+              }
+            ]
+          },
+          {
+            "type": "ScenarioInfo",
+            "signInfos": [
+              {
+                "detector": "videoPlayerDetector",
+                "chaining": {
+                  "method": {
+                    "name": "timing",
+                    "namedArguments": {
+                      "id": {
+                        "type": "String",
+                        "value": "v2"
+                      },
+                      "timing": {
+                        "type": "double",
+                        "value": 48353.48
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "roleInfos": [],
+            "max": {
+              "type": "EventStateInfo",
+              "value": {
+                "type": "EventState",
+                "value": "end"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "actorType": "videoContol",
+      "controllerType": "VideoScenarioController",
+      "args": {
+        "name": {
+          "type": "String",
+          "value": "poop3"
+        },
+        "width": {
+          "type": "double",
+          "value": 660
+        },
+        "height": {
+          "type": "double",
+          "value": 720.0
+        },
+        "initialPosition": {
+          "type": "Offset",
+          "value": {
+            "dx": 300.0,
+            "dy": 0.0
+          }
+        },
+        "allowInitialVisibility": {
+          "type": "bool",
+          "value": false
+        },
+        "allowContinueActing": {
+          "type": "bool",
+          "value": false
+        },
+        "allowContinueVisibility": {
+          "type": "bool",
+          "value": false
+        },
+        "sectionColor": {
+          "type": "Color",
+          "value": "644caf50"
+        }
+      },
+      "info": {
+        "type": "CombineInfo",
+        "method": "combineNext",
+        "scenarioInfos": [
+          {
+            "type": "CombineInfo",
+            "method": "combineAnd",
+            "scenarioInfos": [
+              {
+                "type": "ScenarioInfo",
+                "signInfos": [
+                  {
+                    "detector": "actorBuildDetector",
+                    "chaining": {
+                      "method": {
+                        "name": "event",
+                        "namedArguments": {
+                          "id": {
+                            "type": "String",
+                            "value": "s3-actorbuild"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "roleInfos": [
+                  {
+                    "name": "PlayVideoEventState",
+                    "namedArguments": {
+                      "from": {
+                        "type": "double",
+                        "value": 48770.32
+                      },
+                      "to": {
+                        "type": "double",
+                        "value": 51688.203
+                      },
+                      "loop": {
+                        "type": "bool",
+                        "value": true
+                      },
+                      "state": {
+                        "type": "EventState",
+                        "value": "start"
+                      }
+                    }
+                  }
+                ],
+                "max": {
+                  "type": "EventStateInfo",
+                  "value": {
+                    "type": "EventState",
+                    "value": "start"
+                  }
+                }
+              },
+              {
+                "type": "ScenarioInfo",
+                "signInfos": [
+                  {
+                    "detector": "tapGestureDetector",
+                    "chaining": {
+                      "instance": {
+                        "name": "tap",
+                        "chaining": {
+                          "method": {
+                            "name": "count",
+                            "namedArguments": {
+                              "id": {
+                                "type": "String",
+                                "value": "s3-tapDetector"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "roleInfos": [
+                  {
+                    "name": "PlayVideoInt",
+                    "namedArguments": {
+                      "number": {
+                        "type": "int",
+                        "value": 2
+                      },
+                      "from": {
+                        "type": "double",
+                        "value": 52105.043
+                      },
+                      "to": {
+                        "type": "double",
+                        "value": 67944.977
+                      },
+                      "loop": {
+                        "type": "bool",
+                        "value": false
+                      }
+                    }
+                  }
+                ],
+                "min": {
+                  "type": "int",
+                  "value": 0
+                },
+                "max": {
+                  "type": "int",
+                  "value": 2
+                }
+              }
+            ]
+          },
+          {
+            "type": "ScenarioInfo",
+            "signInfos": [
+              {
+                "detector": "videoPlayerDetector",
+                "chaining": {
+                  "method": {
+                    "name": "timing",
+                    "namedArguments": {
+                      "id": {
+                        "type": "String",
+                        "value": "s3-videoDetector"
+                      },
+                      "timing": {
+                        "type": "double",
+                        "value": 67944.977
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "roleInfos": [],
+            "max": {
+              "type": "EventStateInfo",
+              "value": {
+                "type": "EventState",
+                "value": "end"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "actorType": "videoContol",
+      "controllerType": "VideoScenarioController",
+      "args": {
+        "name": {
+          "type": "String",
+          "value": "poop4"
+        },
+        "width": {
+          "type": "double",
+          "value": 660
+        },
+        "height": {
+          "type": "double",
+          "value": 720.0
+        },
+        "initialPosition": {
+          "type": "Offset",
+          "value": {
+            "dx": 395.0,
+            "dy": 0.0
+          }
+        },
+        "allowInitialVisibility": {
+          "type": "bool",
+          "value": false
+        },
+        "allowContinueActing": {
+          "type": "bool",
+          "value": false
+        },
+        "allowContinueVisibility": {
+          "type": "bool",
+          "value": false
+        },
+        "sectionColor": {
+          "type": "Color",
+          "value": "64ffeb3b"
+        }
+      },
+      "info": {
+        "type": "CombineInfo",
+        "method": "combineNext",
+        "scenarioInfos": [
+          {
+            "type": "CombineInfo",
+            "method": "combineAnd",
+            "scenarioInfos": [
+              {
+                "type": "ScenarioInfo",
+                "signInfos": [
+                  {
+                    "detector": "actorBuildDetector",
+                    "chaining": {
+                      "method": {
+                        "name": "event",
+                        "namedArguments": {
+                          "id": {
+                            "type": "String",
+                            "value": "s4-actorbuild"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "roleInfos": [
+                  {
+                    "name": "PlayVideoEventState",
+                    "namedArguments": {
+                      "from": {
+                        "type": "double",
+                        "value": 68361.817
+                      },
+                      "to": {
+                        "type": "double",
+                        "value": 69820.758
+                      },
+                      "loop": {
+                        "type": "bool",
+                        "value": true
+                      },
+                      "state": {
+                        "type": "EventState",
+                        "value": "start"
+                      }
+                    }
+                  }
+                ],
+                "max": {
+                  "type": "EventStateInfo",
+                  "value": {
+                    "type": "EventState",
+                    "value": "start"
+                  }
+                }
+              },
+              {
+                "type": "ScenarioInfo",
+                "signInfos": [
+                  {
+                    "detector": "tapGestureDetector",
+                    "chaining": {
+                      "instance": {
+                        "name": "tap",
+                        "chaining": {
+                          "method": {
+                            "name": "count",
+                            "namedArguments": {
+                              "id": {
+                                "type": "String",
+                                "value": "s4-tapDetector"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "roleInfos": [
+                  {
+                    "name": "PlayVideoInt",
+                    "namedArguments": {
+                      "number": {
+                        "type": "int",
+                        "value": 2
+                      },
+                      "from": {
+                        "type": "double",
+                        "value": 70029.178
+                      },
+                      "to": {
+                        "type": "double",
+                        "value": 101750.729
+                      },
+                      "loop": {
+                        "type": "bool",
+                        "value": false
+                      }
+                    }
+                  }
+                ],
+                "min": {
+                  "type": "int",
+                  "value": 0
+                },
+                "max": {
+                  "type": "int",
+                  "value": 2
+                }
+              }
+            ]
+          },
+          {
+            "type": "ScenarioInfo",
+            "signInfos": [
+              {
+                "detector": "videoPlayerDetector",
+                "chaining": {
+                  "method": {
+                    "name": "timing",
+                    "namedArguments": {
+                      "id": {
+                        "type": "String",
+                        "value": "s4-videoDetector"
+                      },
+                      "timing": {
+                        "type": "double",
+                        "value": 101750.729
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "roleInfos": [],
+            "max": {
+              "type": "EventStateInfo",
+              "value": {
+                "type": "EventState",
+                "value": "end"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "actorType": "videoContol",
+      "controllerType": "VideoScenarioController",
+      "args": {
+        "name": {
+          "type": "String",
+          "value": "poop5"
+        },
+        "width": {
+          "type": "double",
+          "value": 200
+        },
+        "height": {
+          "type": "double",
+          "value": 200
+        },
+        "initialPosition": {
+          "type": "Offset",
+          "value": {
+            "dx": 395,
+            "dy": 115
+          }
+        },
+        "allowInitialVisibility": {
+          "type": "bool",
+          "value": false
+        },
+        "allowContinueActing": {
+          "type": "bool",
+          "value": false
+        },
+        "allowContinueVisibility": {
+          "type": "bool",
+          "value": false
+        },
+        "sectionColor": {
+          "type": "Color",
+          "value": "649c27b0"
+        }
+      },
+      "info": {
+        "type": "CombineInfo",
+        "method": "combineNext",
+        "scenarioInfos": [
+          {
+            "type": "CombineInfo",
+            "method": "combineAnd",
+            "scenarioInfos": [
+              {
+                "type": "ScenarioInfo",
+                "signInfos": [
+                  {
+                    "detector": "actorBuildDetector",
+                    "chaining": {
+                      "method": {
+                        "name": "event",
+                        "namedArguments": {
+                          "id": {
+                            "type": "String",
+                            "value": "s5-actorbuild"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "roleInfos": [
+                  {
+                    "name": "PlayVideoEventState",
+                    "namedArguments": {
+                      "from": {
+                        "type": "double",
+                        "value": 101792.413
+                      },
+                      "to": {
+                        "type": "double",
+                        "value": 102334.305
+                      },
+                      "loop": {
+                        "type": "bool",
+                        "value": true
+                      },
+                      "state": {
+                        "type": "EventState",
+                        "value": "start"
+                      }
+                    }
+                  }
+                ],
+                "max": {
+                  "type": "EventStateInfo",
+                  "value": {
+                    "type": "EventState",
+                    "value": "start"
+                  }
+                }
+              },
+              {
+                "type": "ScenarioInfo",
+                "signInfos": [
+                  {
+                    "detector": "tapGestureDetector",
+                    "chaining": {
+                      "instance": {
+                        "name": "tapUp",
+                        "chaining": {
+                          "method": {
+                            "name": "event",
+                            "namedArguments": {
+                              "id": {
+                                "type": "String",
+                                "value": "s5-tapDetector"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "detector": "dragGestureDetector",
+                    "chaining": {
+                      "instance": {
+                        "name": "end",
+                        "chaining": {
+                          "method": {
+                            "name": "event",
+                            "namedArguments": {
+                              "id": {
+                                "type": "String",
+                                "value": "s5-dragDetector"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "roleInfos": [
+                  {
+                    "name": "PlayVideoEventState",
+                    "namedArguments": {
+                      "state": {
+                        "type": "EventState",
+                        "value": "end"
+                      },
+                      "from": {
+                        "type": "double",
+                        "value": 102375.989
+                      },
+                      "to": {
+                        "type": "double",
+                        "value": 121133.805
+                      }
+                    }
+                  }
+                ],
+                "max": {
+                  "type": "EventStateInfo",
+                  "value": {
+                    "type": "EventState",
+                    "value": "end"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "ScenarioInfo",
+            "signInfos": [
+              {
+                "detector": "videoPlayerDetector",
+                "chaining": {
+                  "method": {
+                    "name": "timing",
+                    "namedArguments": {
+                      "id": {
+                        "type": "String",
+                        "value": "s5-videoDetector"
+                      },
+                      "timing": {
+                        "type": "double",
+                        "value": 121133.805
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "roleInfos": [],
+            "max": {
+              "type": "EventStateInfo",
+              "value": {
+                "type": "EventState",
+                "value": "end"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "actorType": "videoContol",
+      "controllerType": "VideoScenarioController",
+      "args": {
+        "name": {
+          "type": "String",
+          "value": "poop6"
+        },
+        "width": {
+          "type": "double",
+          "value": 540
+        },
+        "height": {
+          "type": "double",
+          "value": 320
+        },
+        "initialPosition": {
+          "type": "Offset",
+          "value": {
+            "dx": 580,
+            "dy": 120
+          }
+        },
+        "allowInitialVisibility": {
+          "type": "bool",
+          "value": false
+        },
+        "allowContinueActing": {
+          "type": "bool",
+          "value": false
+        },
+        "allowContinueVisibility": {
+          "type": "bool",
+          "value": false
+        },
+        "sectionColor": {
+          "type": "Color",
+          "value": "64ffc107"
+        }
+      },
+      "info": {
+        "type": "CombineInfo",
+        "method": "combineNext",
+        "scenarioInfos": [
+          {
+            "type": "CombineInfo",
+            "method": "combineAnd",
+            "scenarioInfos": [
+              {
+                "type": "ScenarioInfo",
+                "signInfos": [
+                  {
+                    "detector": "actorBuildDetector",
+                    "chaining": {
+                      "method": {
+                        "name": "event",
+                        "namedArguments": {
+                          "id": {
+                            "type": "String",
+                            "value": "s6-actorbuild"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "roleInfos": [
+                  {
+                    "name": "PlayVideoEventState",
+                    "namedArguments": {
+                      "from": {
+                        "type": "double",
+                        "value": 121300.541
+                      },
+                      "to": {
+                        "type": "double",
+                        "value": 125052.105
+                      },
+                      "loop": {
+                        "type": "bool",
+                        "value": true
+                      },
+                      "state": {
+                        "type": "EventState",
+                        "value": "start"
+                      }
+                    }
+                  }
+                ],
+                "max": {
+                  "type": "EventStateInfo",
+                  "value": {
+                    "type": "EventState",
+                    "value": "start"
+                  }
+                }
+              },
+              {
+                "type": "ScenarioInfo",
+                "signInfos": [
+                  {
+                    "detector": "tapGestureDetector",
+                    "chaining": {
+                      "instance": {
+                        "name": "tapUp",
+                        "chaining": {
+                          "method": {
+                            "name": "event",
+                            "namedArguments": {
+                              "id": {
+                                "type": "String",
+                                "value": "s6-tapDetector"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ],
+                "roleInfos": [
+                  {
+                    "name": "PlayVideoEventState",
+                    "namedArguments": {
+                      "from": {
+                        "type": "double",
+                        "value": 125468.945
+                      },
+                      "to": {
+                        "type": "double",
+                        "value": 137557.315
+                      },
+                      "state": {
+                        "type": "EventState",
+                        "value": "end"
+                      }
+                    }
+                  }
+                ],
+                "max": {
+                  "type": "EventStateInfo",
+                  "value": {
+                    "type": "EventState",
+                    "value": "end"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "ScenarioInfo",
+            "signInfos": [
+              {
+                "detector": "videoPlayerDetector",
+                "chaining": {
+                  "method": {
+                    "name": "timing",
+                    "namedArguments": {
+                      "id": {
+                        "type": "String",
+                        "value": "s6-videoDetector"
+                      },
+                      "timing": {
+                        "type": "double",
+                        "value": 137557.315
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "roleInfos": [],
+            "max": {
+              "type": "EventStateInfo",
+              "value": {
+                "type": "EventState",
+                "value": "end"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
