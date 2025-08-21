@@ -161,11 +161,12 @@ class _NodeWidgetState extends State<NodeWidget> {
         onDragUpdate: (details) {
           final canvasModel = context.read<CanvasModel>();
 
-          _accumulatedDelta += details.delta;
+          // 현재 스케일에 따라 delta 보정
+          final currentScale = canvasModel.scale;
+          final adjustedDelta = details.delta / currentScale;
+          _accumulatedDelta += adjustedDelta;
+
           final canvasPosition = _dragStartPosition! + _accumulatedDelta;
-          print('🟡 [PORT_DRAG] Global: ${details.globalPosition}, Local: ${details.localPosition}');
-          print('🟡 [PORT_DRAG] Start: $_dragStartPosition, Delta: $_accumulatedDelta');
-          print('🟡 [PORT_DRAG] Final Position: $canvasPosition');
           canvasModel.updateTemporaryConnection(canvasPosition);
         },
         onDragEnd: (details) {
@@ -176,11 +177,7 @@ class _NodeWidgetState extends State<NodeWidget> {
         feedback: Container(
           width: 12,
           height: 12,
-          decoration: BoxDecoration(
-            color: port.color.withValues(alpha: 0.8),
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
-          ),
+          decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
         ),
         child: Container(
           key: portKey,

@@ -16,6 +16,14 @@ class _CanvasWidgetState extends State<CanvasWidget> {
   final TransformationController _transformationController =
       TransformationController();
 
+  void _onInteractionUpdate() {
+    final transform = _transformationController.value;
+    final scale = transform.getMaxScaleOnAxis();
+
+    // CanvasModel에 현재 스케일 업데이트
+    context.read<CanvasModel>().scale = scale;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<CanvasModel>(
@@ -23,6 +31,7 @@ class _CanvasWidgetState extends State<CanvasWidget> {
         return SizedBox.expand(
           child: InteractiveViewer(
             transformationController: _transformationController,
+            onInteractionUpdate: (_) => _onInteractionUpdate(),
             boundaryMargin: const EdgeInsets.all(double.infinity),
             minScale: 0.1,
             maxScale: 5.0,
@@ -52,6 +61,15 @@ class _CanvasWidgetState extends State<CanvasWidget> {
                         painter: GridPainter(canvasModel),
                         child: Stack(
                           children: [
+                            Positioned(
+                              left: 25619,
+                              top: 25070,
+                              child: Container(
+                                height: 50,
+                                width: 50,
+                                color: Colors.red,
+                              ),
+                            ),
                             // 연결선을 노드들 뒤에 그리기
                             CustomPaint(
                               painter: ConnectionPainter(canvasModel),
@@ -114,10 +132,6 @@ class _CanvasWidgetState extends State<CanvasWidget> {
       details.offset,
     );
     final nodeType = details.data;
-    
-    // 디버그 로그
-    print('🔴 [NODE_DROP] Raw Offset: ${details.offset}');
-    print('🔴 [NODE_DROP] Canvas Position: $canvasPosition');
 
     // 새 노드 생성
     final newNode = NodeModel(
