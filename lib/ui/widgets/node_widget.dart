@@ -23,6 +23,10 @@ class _NodeWidgetState extends State<NodeWidget> {
   bool _isDragging = false;
   final Map<String, GlobalKey> _portKeys = {};
 
+  // 드래그 상태 관리
+  Offset? _dragStartPosition;
+  Offset _accumulatedDelta = Offset.zero;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -150,22 +154,23 @@ class _NodeWidgetState extends State<NodeWidget> {
         onDragStarted: () {
           // 캔버스 좌표계에서의 포트 위치 계산
           final canvasPosition = _getPortCanvasPosition(port);
-          print('🔵 [DRAG_START] Port: ${port.label}');
-          print('🔵 [DRAG_START] Canvas Position: $canvasPosition');
+          _dragStartPosition = canvasPosition;
+          _accumulatedDelta = Offset.zero;
           canvasModel.startConnection(widget.node.id, port.id, canvasPosition);
         },
         onDragUpdate: (details) {
           final canvasModel = context.read<CanvasModel>();
 
-          // InteractiveViewer 내부에서는 localPosition을 사용 (자동 변환됨)
-          final canvasPosition = details.localPosition;
-
-          print('🟡 [DRAG_UPDATE] Global Position: ${details.globalPosition}');  
-          print('🟡 [DRAG_UPDATE] Local Position: ${details.localPosition}');
-          print('🟡 [DRAG_UPDATE] Canvas Position (InteractiveViewer): $canvasPosition');
+          _accumulatedDelta += details.delta;
+          final canvasPosition = _dragStartPosition! + _accumulatedDelta;
+          print('🟡 [PORT_DRAG] Global: ${details.globalPosition}, Local: ${details.localPosition}');
+          print('🟡 [PORT_DRAG] Start: $_dragStartPosition, Delta: $_accumulatedDelta');
+          print('🟡 [PORT_DRAG] Final Position: $canvasPosition');
           canvasModel.updateTemporaryConnection(canvasPosition);
         },
         onDragEnd: (details) {
+          _dragStartPosition = null;
+          _accumulatedDelta = Offset.zero;
           canvasModel.cancelConnection();
         },
         feedback: Container(
@@ -213,15 +218,11 @@ class _NodeWidgetState extends State<NodeWidget> {
     }
   }
 
-  /// 캔버스 좌표계에서 포트 위치를 계산합니다
   Offset _getPortCanvasPosition(NodePort port) {
-    // 노드 위치 기준으로 포트 상대 위치 계산
-    double currentY = 32.0 + 8.0; // headerHeight + padding
-
-    // 입력 포트들 처리
+    double currentY = 32.0 + 8.0;
     for (int i = 0; i < widget.node.inputPorts.length; i++) {
       if (widget.node.inputPorts[i] == port) {
-        final portCenterY = currentY + 2.0 + 6.0; // margin + handle center
+        final portCenterY = currentY + 2.0 + 6.0;
         return Offset(
           widget.node.position.dx + 8.0 + 6.0,
           widget.node.position.dy + portCenterY,
@@ -229,17 +230,14 @@ class _NodeWidgetState extends State<NodeWidget> {
       }
       currentY += 16.0;
     }
-
-    // 포트 간 간격
     if (widget.node.inputPorts.isNotEmpty &&
         widget.node.outputPorts.isNotEmpty) {
       currentY += 8.0;
     }
 
-    // 출력 포트들 처리
     for (int i = 0; i < widget.node.outputPorts.length; i++) {
       if (widget.node.outputPorts[i] == port) {
-        final portCenterY = currentY + 2.0 + 6.0; // margin + handle center
+        final portCenterY = currentY + 2.0 + 6.0;
         return Offset(
           widget.node.position.dx + 200.0 - 8.0 - 6.0,
           widget.node.position.dy + portCenterY,
@@ -248,13 +246,12 @@ class _NodeWidgetState extends State<NodeWidget> {
       currentY += 16.0;
     }
 
-    return widget.node.position; // fallback
+    return widget.node.position;
   }
 
   @override
   void initState() {
     super.initState();
-    // 포트 위치를 정기적으로 업데이트
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateAllPortPositions();
     });
@@ -262,8 +259,6 @@ class _NodeWidgetState extends State<NodeWidget> {
 
   void _updateAllPortPositions() {
     final canvasModel = context.read<CanvasModel>();
-
-    // 모든 포트 위치 업데이트
     for (final port in [
       ...widget.node.inputPorts,
       ...widget.node.outputPorts,

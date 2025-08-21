@@ -112,6 +112,7 @@ class _NodePaletteItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Draggable<NodeType>(
       data: type,
+      dragAnchorStrategy: pointerDragAnchorStrategy,
       feedback: Material(
         color: Colors.transparent,
         child: Container(

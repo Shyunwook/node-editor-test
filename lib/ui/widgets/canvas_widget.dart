@@ -107,9 +107,17 @@ class _CanvasWidgetState extends State<CanvasWidget> {
     DragTargetDetails<NodeType> details,
     CanvasModel canvasModel,
   ) {
-    // InteractiveViewer 내부에서는 offset을 직접 사용
-    final canvasPosition = details.offset;
+    // DragTarget이 InteractiveViewer 내부에 있으므로 좌표 변환 필요
+    final transform = _transformationController.value;
+    final canvasPosition = MatrixUtils.transformPoint(
+      Matrix4.inverted(transform),
+      details.offset,
+    );
     final nodeType = details.data;
+    
+    // 디버그 로그
+    print('🔴 [NODE_DROP] Raw Offset: ${details.offset}');
+    print('🔴 [NODE_DROP] Canvas Position: $canvasPosition');
 
     // 새 노드 생성
     final newNode = NodeModel(
