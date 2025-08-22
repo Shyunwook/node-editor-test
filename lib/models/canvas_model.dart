@@ -26,8 +26,30 @@ class CanvasModel extends ChangeNotifier {
 
   double get scale => _scale;
   set scale(double value) {
+    final oldScale = _scale;
     _scale = value;
+    
+    // 스케일 변화 시 모든 포트 위치 업데이트 요청
+    if (oldScale != value) {
+      _requestPortPositionUpdate();
+    }
+    
     notifyListeners();
+  }
+
+  // 포트 위치 업데이트 요청
+  void _requestPortPositionUpdate() {
+    // 다음 프레임에서 포트 위치 업데이트
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      for (final node in _nodes) {
+        for (final port in [...node.inputPorts, ...node.outputPorts]) {
+          if (port.relativePosition != null) {
+            final canvasPosition = port.getCanvasPosition(node.position);
+            updatePortPosition(node.id, port.id, canvasPosition);
+          }
+        }
+      }
+    });
   }
 
   List<NodeModel> get nodes => List.unmodifiable(_nodes);

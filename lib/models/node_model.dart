@@ -83,6 +83,7 @@ class NodePort {
   final PortType type;
   final Color color;
   Offset? position; // 글로벌 포지션
+  Offset? relativePosition; // 노드 내에서의 상대 위치
 
   NodePort({
     required this.id,
@@ -90,5 +91,12 @@ class NodePort {
     required this.type,
     required this.color,
     this.position,
+    this.relativePosition,
   });
+
+  // 노드 위치를 기준으로 캔버스 절대 좌표 계산
+  Offset getCanvasPosition(Offset nodePosition) {
+    if (relativePosition == null) return nodePosition;
+    return nodePosition + relativePosition!;
+  }
 }

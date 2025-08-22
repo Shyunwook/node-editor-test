@@ -21,11 +21,22 @@ class NodeWidget extends StatefulWidget {
 
 class _NodeWidgetState extends State<NodeWidget> {
   bool _isDragging = false;
-  final Map<String, GlobalKey> _portKeys = {};
 
   // 드래그 상태 관리
   Offset? _dragStartPosition;
   Offset _accumulatedDelta = Offset.zero;
+
+  // 포트 위치 측정 콜백
+  void _onPortPositionMeasured(NodePort port, Offset relativePosition) {
+    // 노드 내에서의 상대 위치를 포트에 저장
+    port.relativePosition = relativePosition;
+    
+    // 캔버스 모델에 절대 위치 업데이트
+    final canvasModel = context.read<CanvasModel>();
+    final canvasPosition = port.getCanvasPosition(widget.node.position);
+    canvasModel.updatePortPosition(widget.node.id, port.id, canvasPosition);
+    
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,56 +134,52 @@ class _NodeWidgetState extends State<NodeWidget> {
             ? MainAxisAlignment.start
             : MainAxisAlignment.end,
         children: [
-          if (isInput) _buildPortHandle(port),
+          if (isInput) _buildMeasuredPortHandle(port),
           if (isInput) const SizedBox(width: 8),
           Text(
             port.label,
             style: const TextStyle(color: Colors.white, fontSize: 12),
           ),
           if (!isInput) const SizedBox(width: 8),
-          if (!isInput) _buildPortHandle(port),
+          if (!isInput) _buildMeasuredPortHandle(port),
         ],
       ),
     );
   }
 
-  Offset getWidgetCenter(RenderBox? renderBox) =>
-      renderBox != null ? (renderBox.size.toOffset() / 2) : Offset.zero;
+  Widget _buildPortContainer(NodePort port, {Color? overrideColor, double? borderWidth}) {
+    return Container(
+      width: 12,
+      height: 12,
+      decoration: BoxDecoration(
+        color: overrideColor ?? port.color,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.white,
+          width: borderWidth ?? 1,
+        ),
+      ),
+    );
+  }
 
-  Widget _buildPortHandle(NodePort port) {
+  Widget _buildMeasuredPortHandle(NodePort port) {
     final canvasModel = context.read<CanvasModel>();
     final isOutput = widget.node.outputPorts.contains(port);
-
-    // 포트별 GlobalKey 생성
-    if (!_portKeys.containsKey(port.id)) {
-      _portKeys[port.id] = GlobalKey();
-    }
-    final portKey = _portKeys[port.id]!;
 
     if (isOutput) {
       // 출력 포트: Draggable로 드래그 시작
       return Draggable<Map<String, String>>(
         data: {'nodeId': widget.node.id, 'portId': port.id},
         onDragStarted: () {
-          final renderBox =
-              portKey.currentContext?.findRenderObject() as RenderBox;
-          print(
-            '[bobby] ${renderBox.localToGlobal(getWidgetCenter(renderBox)) * canvasModel.scale}',
-          );
-          // 캔버스 좌표계에서의 포트 위치 계산
-          final canvasPosition = _getPortCanvasPosition(port);
+          final canvasPosition = port.getCanvasPosition(widget.node.position);
           _dragStartPosition = canvasPosition;
           _accumulatedDelta = Offset.zero;
           canvasModel.startConnection(widget.node.id, port.id, canvasPosition);
         },
         onDragUpdate: (details) {
-          final canvasModel = context.read<CanvasModel>();
-
-          // 현재 스케일에 따라 delta 보정
           final currentScale = canvasModel.scale;
           final adjustedDelta = details.delta / currentScale;
           _accumulatedDelta += adjustedDelta;
-
           final canvasPosition = _dragStartPosition! + _accumulatedDelta;
           canvasModel.updateTemporaryConnection(canvasPosition);
         },
@@ -183,24 +190,12 @@ class _NodeWidgetState extends State<NodeWidget> {
         },
         feedback: Transform.scale(
           scale: canvasModel.scale,
-          child: Container(
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(
-              color: Colors.red,
-              shape: BoxShape.circle,
-            ),
-          ),
+          child: _buildPortContainer(port, overrideColor: Colors.red),
         ),
-        child: Container(
-          key: portKey,
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: port.color,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 1),
-          ),
+        child: MeasuredPortWidget(
+          port: port,
+          onPositionMeasured: _onPortPositionMeasured,
+          child: _buildPortContainer(port),
         ),
       );
     } else {
@@ -210,17 +205,14 @@ class _NodeWidgetState extends State<NodeWidget> {
           canvasModel.completeConnection(widget.node.id, port.id);
         },
         builder: (context, candidateData, rejectedData) {
-          return Container(
-            key: portKey,
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(
-              color: candidateData.isNotEmpty ? Colors.green : port.color,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: candidateData.isNotEmpty ? Colors.white : Colors.white,
-                width: candidateData.isNotEmpty ? 2 : 1,
-              ),
+          final isHovering = candidateData.isNotEmpty;
+          return MeasuredPortWidget(
+            port: port,
+            onPositionMeasured: _onPortPositionMeasured,
+            child: _buildPortContainer(
+              port,
+              overrideColor: isHovering ? Colors.green : null,
+              borderWidth: isHovering ? 2 : 1,
             ),
           );
         },
@@ -228,72 +220,85 @@ class _NodeWidgetState extends State<NodeWidget> {
     }
   }
 
-  Offset _getPortCanvasPosition(NodePort port) {
-    double currentY = 32.0 + 8.0;
-    for (int i = 0; i < widget.node.inputPorts.length; i++) {
-      if (widget.node.inputPorts[i] == port) {
-        final portCenterY = currentY + 2.0 + 6.0;
-        return Offset(
-          widget.node.position.dx + 8.0 + 6.0,
-          widget.node.position.dy + portCenterY,
-        );
-      }
-      currentY += 16.0;
-    }
-    if (widget.node.inputPorts.isNotEmpty &&
-        widget.node.outputPorts.isNotEmpty) {
-      currentY += 8.0;
-    }
 
-    for (int i = 0; i < widget.node.outputPorts.length; i++) {
-      if (widget.node.outputPorts[i] == port) {
-        final portCenterY = currentY + 2.0 + 6.0;
-        return Offset(
-          widget.node.position.dx + 200.0 - 8.0 - 6.0,
-          widget.node.position.dy + portCenterY,
-        );
-      }
-      currentY += 16.0;
-    }
 
-    return widget.node.position;
-  }
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _updateAllPortPositions();
-    });
+  }
+}
+
+// 포트 위치를 측정하는 위젯
+class MeasuredPortWidget extends StatefulWidget {
+  final Widget child;
+  final NodePort port;
+  final Function(NodePort, Offset) onPositionMeasured;
+
+  const MeasuredPortWidget({
+    super.key,
+    required this.child,
+    required this.port,
+    required this.onPositionMeasured,
+  });
+
+  @override
+  State<MeasuredPortWidget> createState() => _MeasuredPortWidgetState();
+}
+
+class _MeasuredPortWidgetState extends State<MeasuredPortWidget> {
+  final GlobalKey _key = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measurePosition());
   }
 
-  void _updateAllPortPositions() {
-    final canvasModel = context.read<CanvasModel>();
-    for (final port in [
-      ...widget.node.inputPorts,
-      ...widget.node.outputPorts,
-    ]) {
-      final portKey = _portKeys[port.id];
-      if (portKey != null && portKey.currentContext != null) {
-        final renderBox =
-            portKey.currentContext!.findRenderObject() as RenderBox?;
-        if (renderBox != null) {
-          final size = renderBox.size;
-          final localCenter = Offset(size.width / 2, size.height / 2);
-          final globalPosition = renderBox.localToGlobal(localCenter);
-          canvasModel.updatePortPosition(
-            widget.node.id,
-            port.id,
-            globalPosition,
-          );
+  @override
+  void didUpdateWidget(covariant MeasuredPortWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 위젯이 업데이트될 때마다 위치 재측정
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measurePosition());
+  }
+
+  void _measurePosition() {
+    final renderBox = _key.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      // 노드 위젯의 렌더박스를 찾기
+      RenderBox? nodeRenderBox;
+      context.visitAncestorElements((element) {
+        if (element.widget is NodeWidget) {
+          nodeRenderBox = element.findRenderObject() as RenderBox?;
+          return false;
         }
+        return true;
+      });
+      
+      if (nodeRenderBox != null) {
+        // 스케일에 영향받지 않는 로컬 좌표계에서 계산
+        final portLocalCenter = Offset(6, 6); // 포트 핸들의 로컬 중심 (12x12의 중심)
+        final portPositionInNode = nodeRenderBox!.globalToLocal(
+          renderBox.localToGlobal(portLocalCenter)
+        );
+        
+        
+        widget.onPositionMeasured(widget.port, portPositionInNode);
+        return;
       }
+      
+      // 폴백: 기존 방식
+      final center = Offset(6, 6); // 12x12 컨테이너의 중심
+      widget.onPositionMeasured(widget.port, center);
     }
   }
-}
 
-extension ToOffset on Size {
-  Offset toOffset() {
-    return Offset(width, height);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: _key,
+      child: widget.child,
+    );
   }
 }
+

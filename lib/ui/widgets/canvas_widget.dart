@@ -61,16 +61,6 @@ class _CanvasWidgetState extends State<CanvasWidget> {
                         painter: GridPainter(canvasModel),
                         child: Stack(
                           children: [
-                            Positioned(
-                              left: 25619,
-                              top: 25070,
-                              child: Container(
-                                height: 50,
-                                width: 50,
-                                color: Colors.red,
-                              ),
-                            ),
-
                             // 노드들을 렌더링
                             ...canvasModel.nodes.map(
                               (node) => AnimatedBuilder(
