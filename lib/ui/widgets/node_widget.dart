@@ -136,6 +136,9 @@ class _NodeWidgetState extends State<NodeWidget> {
     );
   }
 
+  Offset getWidgetCenter(RenderBox? renderBox) =>
+      renderBox != null ? (renderBox.size.toOffset() / 2) : Offset.zero;
+
   Widget _buildPortHandle(NodePort port) {
     final canvasModel = context.read<CanvasModel>();
     final isOutput = widget.node.outputPorts.contains(port);
@@ -152,6 +155,11 @@ class _NodeWidgetState extends State<NodeWidget> {
         data: {'nodeId': widget.node.id, 'portId': port.id},
         dragAnchorStrategy: pointerDragAnchorStrategy,
         onDragStarted: () {
+          final renderBox =
+              portKey.currentContext?.findRenderObject() as RenderBox;
+          print(
+            '[bobby] ${renderBox.localToGlobal(getWidgetCenter(renderBox)) * canvasModel.scale}',
+          );
           // 캔버스 좌표계에서의 포트 위치 계산
           final canvasPosition = _getPortCanvasPosition(port);
           _dragStartPosition = canvasPosition;
@@ -276,5 +284,11 @@ class _NodeWidgetState extends State<NodeWidget> {
         }
       }
     }
+  }
+}
+
+extension ToOffset on Size {
+  Offset toOffset() {
+    return Offset(width, height);
   }
 }
