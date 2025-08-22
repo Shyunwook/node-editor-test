@@ -70,11 +70,7 @@ class _CanvasWidgetState extends State<CanvasWidget> {
                                 color: Colors.red,
                               ),
                             ),
-                            // 연결선을 노드들 뒤에 그리기
-                            CustomPaint(
-                              painter: ConnectionPainter(canvasModel),
-                              size: const Size(50000, 50000),
-                            ),
+
                             // 노드들을 렌더링
                             ...canvasModel.nodes.map(
                               (node) => AnimatedBuilder(
@@ -95,6 +91,10 @@ class _CanvasWidgetState extends State<CanvasWidget> {
                                   );
                                 },
                               ),
+                            ),
+                            // 연결선을 노드들 뒤에 그리기
+                            CustomPaint(
+                              painter: ConnectionPainter(canvasModel),
                             ),
                           ],
                         ),

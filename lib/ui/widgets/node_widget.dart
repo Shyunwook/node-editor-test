@@ -153,7 +153,6 @@ class _NodeWidgetState extends State<NodeWidget> {
       // 출력 포트: Draggable로 드래그 시작
       return Draggable<Map<String, String>>(
         data: {'nodeId': widget.node.id, 'portId': port.id},
-        dragAnchorStrategy: pointerDragAnchorStrategy,
         onDragStarted: () {
           final renderBox =
               portKey.currentContext?.findRenderObject() as RenderBox;
@@ -182,10 +181,16 @@ class _NodeWidgetState extends State<NodeWidget> {
           _accumulatedDelta = Offset.zero;
           canvasModel.cancelConnection();
         },
-        feedback: Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+        feedback: Transform.scale(
+          scale: canvasModel.scale,
+          child: Container(
+            width: 12,
+            height: 12,
+            decoration: BoxDecoration(
+              color: Colors.red,
+              shape: BoxShape.circle,
+            ),
+          ),
         ),
         child: Container(
           key: portKey,
